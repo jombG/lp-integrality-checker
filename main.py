@@ -83,6 +83,8 @@ def main() -> None:
         default="o4-mini",
         help="OpenAI model name for LLM oracle (default: o4-mini)",
     )
+    parser.add_argument("--n-min", type=int, default=None, help="Minimum n for oracle generation")
+    parser.add_argument("--n-max", type=int, default=None, help="Maximum n for oracle generation")
     parser.add_argument("--delay", type=float, default=5.0, help="Delay in seconds between iterations (default: 5)")
     args = parser.parse_args()
 
@@ -94,16 +96,26 @@ def main() -> None:
         request_delay=args.delay,
     )
 
+    n_range: tuple[int, int] | None = None
+    if args.n_min is not None or args.n_max is not None:
+        n_range = (args.n_min or 3, args.n_max or 300)
+
     if args.oracle == "llm":
         try:
             from oracle.llm_oracle import LLMOracle
-            oracle: OracleBase = LLMOracle(model=args.model)
+            kwargs: dict = {"model": args.model}
+            if n_range:
+                kwargs["n_range"] = n_range
+            oracle: OracleBase = LLMOracle(**kwargs)
         except ImportError:
             print("LLM oracle requires 'openai' package. Install with: pip install openai")
             sys.exit(1)
     else:
         from oracle.random_oracle import RandomOracle
-        oracle = RandomOracle()
+        kwargs_r: dict = {}
+        if n_range:
+            kwargs_r["n_range"] = n_range
+        oracle = RandomOracle(**kwargs_r)
 
     run(oracle, config)
 

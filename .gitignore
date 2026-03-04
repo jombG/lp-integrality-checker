@@ -9,7 +9,7 @@ build/
 .venv/
 
 # History
-history.jsonl
+*.jsonl
 
 # IDE
 .idea/
