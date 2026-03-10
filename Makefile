@@ -2,7 +2,7 @@
 
 PYTHON  := .venv/bin/python
 PIP     := .venv/bin/pip
-HISTORY := history.jsonl
+HISTORY_PATTERN := history_*.jsonl
 
 ## —— Setup ——————————————————————————————————————
 
@@ -27,8 +27,8 @@ clean: ## Remove __pycache__ and .pyc files
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name '*.pyc' -delete 2>/dev/null || true
 
-reset-history: ## Delete history.jsonl
-	rm -f $(HISTORY)
+reset-history: ## Delete all history files
+	rm -f $(HISTORY_PATTERN)
 
 ## —— Code quality ———————————————————————————————
 

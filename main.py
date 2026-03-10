@@ -4,6 +4,7 @@ import argparse
 import logging
 import sys
 import time
+from datetime import datetime
 
 from config import Config
 from history import load_history, write_feedback
@@ -70,7 +71,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Counterexample finder for Task17 LP relaxation")
     parser.add_argument("--max-iter", type=int, default=100)
     parser.add_argument("--tol", type=float, default=1e-6)
-    parser.add_argument("--history", default="history.jsonl")
+    parser.add_argument("--history", default=None)
     parser.add_argument("--solver", default="appsi_highs")
     parser.add_argument(
         "--oracle",
@@ -88,10 +89,15 @@ def main() -> None:
     parser.add_argument("--delay", type=float, default=5.0, help="Delay in seconds between iterations (default: 5)")
     args = parser.parse_args()
 
+    history_file = args.history
+    if history_file is None:
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        history_file = f"history_{args.oracle}_{ts}.jsonl"
+
     config = Config(
         max_iterations=args.max_iter,
         integrality_tolerance=args.tol,
-        history_file=args.history,
+        history_file=history_file,
         solver_name=args.solver,
         request_delay=args.delay,
     )
